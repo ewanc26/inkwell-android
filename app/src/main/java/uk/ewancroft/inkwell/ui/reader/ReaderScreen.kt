@@ -24,7 +24,7 @@ import androidx.compose.material.icons.outlined.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderScreen() {
-    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Following", "Yours")
 
     Column {

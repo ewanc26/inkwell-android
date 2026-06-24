@@ -107,7 +107,12 @@ fun InkwellTheme(
 }
 
 private fun uk.ewancroft.inkwell.data.model.ColorValue.toColor(): Color =
-    Color(red = r, green = g, blue = b, alpha = a?.coerceIn(0, 100)?.div(100f) ?: 1f)
+    Color(
+        red = r / 255f,
+        green = g / 255f,
+        blue = b / 255f,
+        alpha = (a ?: 100) / 100f
+    )
 
 private fun RgbColor.toColor(): Color =
-    Color(red = r, green = g, blue = b)
+    Color(red = r / 255f, green = g / 255f, blue = b / 255f)
