@@ -14,9 +14,11 @@ package uk.ewancroft.inkwell.data.remote
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 import uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile
@@ -54,7 +56,7 @@ class AtProtoClient(
         // public relay when resolution fails (read-only queries).
         val base = if (did == currentDid) pdsUrl else resolvePdsUrl(did)
             ?: "https://public.api.bsky.app"
-        val url = "$base/xrpc/com.atproto.repo.listRecords".toHttpUrl {
+        val url = "$base/xrpc/com.atproto.repo.listRecords".buildHttpUrl {
             addQueryParameter("repo", did)
             addQueryParameter("collection", collection)
             addQueryParameter("limit", limit.toString())
@@ -126,7 +128,7 @@ class AtProtoClient(
         val parsed = requireNotNull(AtUriModel.parse(uri))
         val base = if (parsed.did == currentDid) pdsUrl else resolvePdsUrl(parsed.did)
             ?: "https://public.api.bsky.app"
-        val url = "$base/xrpc/com.atproto.repo.getRecord".toHttpUrl {
+        val url = "$base/xrpc/com.atproto.repo.getRecord".buildHttpUrl {
             addQueryParameter("repo", parsed.did)
             addQueryParameter("collection", parsed.collection)
             addQueryParameter("rkey", parsed.recordKey)
@@ -144,8 +146,14 @@ class AtProtoClient(
 // ── URL Builder Extension ────────────────────────────────────────────────
 
 /** Builds an HttpUrl from a base string, applying the builder block. */
-private fun String.toHttpUrl(block: HttpUrl.Builder.() -> Unit): HttpUrl {
-    val builder = requireNotNull(HttpUrl.parse(this)) { "Invalid base URL: $this" }.newBuilder()
-    builder.block()
+private fun String.buildHttpUrl(block: HttpUrl.Builder.() -> Unit): HttpUrl {
+    val uri = java.net.URI(this)
+    val builder = HttpUrl.Builder()
+        .scheme(uri.scheme)
+        .host(uri.host)
+    if (uri.port != -1) builder.port(uri.port)
+    if (uri.rawPath.isNotEmpty()) builder.encodedPath(uri.rawPath)
+    if (uri.rawQuery != null) builder.encodedQuery(uri.rawQuery)
+    builder.apply(block)
     return builder.build()
 }

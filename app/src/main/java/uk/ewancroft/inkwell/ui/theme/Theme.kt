@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import uk.ewancroft.inkwell.data.model.atproto.BasicTheme
+import uk.ewancroft.inkwell.data.model.atproto.ColorValue
 import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
 import uk.ewancroft.inkwell.data.model.atproto.RgbColor
 
