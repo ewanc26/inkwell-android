@@ -1,24 +1,49 @@
+# ── Inkwell Android Version Catalog ──────────────────────────────────────
+#
+# Single source of truth for all dependency versions. Keep these aligned
+# with Inkwell iOS's Package.swift where analogues exist (OkHttp ↔ URLSession,
+# Coil ↔ Kingfisher, kotlinx.serialization ↔ Codable).
+#
+# Upgrade order: AGP -> Kotlin -> Compose BOM -> everything else.
+
 [versions]
+# Build
 agp = "8.8.0"
 kotlin = "2.1.0"
+
+# UI — Compose
 compose-bom = "2025.06.00"
 compose-compiler = "1.5.16"
+
+# Android platform
 activity-compose = "1.10.0"
 navigation-compose = "2.8.7"
 lifecycle = "2.9.0"
+
+# Network
 retrofit = "2.11.0"
 okhttp = "4.12.0"
+
+# Kotlin
 kotlinx-serialization = "1.7.3"
 kotlinx-coroutines = "1.9.0"
+
+# Data & Background
 datastore = "1.1.2"
 workmanager = "2.10.0"
+
+# Image loading
 coil = "2.7.0"
+
+# DI
 hilt = "2.53"
 hilt-navigation-compose = "1.2.0"
+
+# Security — credential manager for OAuth
 credentials = "1.5.0"
 
 [libraries]
-# Compose
+# ── Compose ──
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -28,42 +53,42 @@ compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 compose-material-icons = { group = "androidx.compose.material", name = "material-icons-extended" }
 compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
 
-# Activity & Navigation
+# ── Activity & Navigation ──
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
 
-# Lifecycle
+# ── Lifecycle ──
 lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
 
-# Network
+# ── Network ──
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-kotlinx-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 
-# Serialization
+# ── Serialization ──
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
-# Coroutines
+# ── Coroutines ──
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 
-# Data
+# ── Data ──
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
-# Background
+# ── Background ──
 workmanager = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workmanager" }
 
-# Image loading
+# ── Image Loading ──
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
-# DI
+# ── DI ──
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 
-# Security
+# ── Security (Credential Manager) ──
 credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 
 [plugins]

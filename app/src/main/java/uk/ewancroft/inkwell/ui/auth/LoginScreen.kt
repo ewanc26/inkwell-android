@@ -1,3 +1,12 @@
+/**
+ * AT Protocol authentication screen with onboarding.
+ *
+ * Walks the user through: what Inkwell is (three feature highlights),
+ * entering their AT Protocol handle, and initiating OAuth sign-in.
+ * No app passwords — the OAuth flow delegates auth to the user's PDS.
+ *
+ * Mirrors Inkwell iOS LoginView in both structure and copy.
+ */
 package uk.ewancroft.inkwell.ui.auth
 
 import androidx.compose.foundation.layout.*
@@ -27,7 +36,7 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Header
+        // ── Brand Header ────────────────────────────────────────────
         Icon(
             Icons.Outlined.Book,
             contentDescription = null,
@@ -44,7 +53,7 @@ fun LoginScreen(
 
         Spacer(Modifier.height(32.dp))
 
-        // Onboarding
+        // ── Onboarding Cards ───────────────────────────────────────
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -60,7 +69,7 @@ fun LoginScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        // Sign-in form
+        // ── Sign-In Form ───────────────────────────────────────────
         OutlinedTextField(
             value = handle,
             onValueChange = { handle = it; errorMessage = null },
@@ -102,6 +111,7 @@ fun LoginScreen(
 
         Spacer(Modifier.height(12.dp))
 
+        // ── Privacy Note ───────────────────────────────────────────
         Text(
             "Your data stays in your Personal Data Server. No app password needed — OAuth only.",
             style = MaterialTheme.typography.bodySmall,
@@ -110,6 +120,7 @@ fun LoginScreen(
     }
 }
 
+/** Single feature row in the onboarding card. */
 @Composable
 private fun FeatureRow(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {

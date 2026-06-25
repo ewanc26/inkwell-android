@@ -1,18 +1,28 @@
+/**
+ * Theme resolution and Material 3 colour scheme for Inkwell.
+ *
+ * Cascades through three theme sources — Leaflet rich theme -> basicTheme ->
+ * system defaults — matching the same logic in Inkwell iOS ReaderTheme.
+ * Inkwell-branded defaults aim for warm, paper-like tones on light and
+ * cool, high-contrast tones on dark.
+ */
 package uk.ewancroft.inkwell.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import uk.ewancroft.inkwell.data.model.BasicTheme
-import uk.ewancroft.inkwell.data.model.PublicationTheme
-import uk.ewancroft.inkwell.data.model.RgbColor
+import uk.ewancroft.inkwell.data.model.atproto.BasicTheme
+import uk.ewancroft.inkwell.data.model.atproto.PublicationTheme
+import uk.ewancroft.inkwell.data.model.atproto.RgbColor
+
+// ── Resolved Theme ───────────────────────────────────────────────────────
 
 /**
- * Resolves a standard.site publication/document theme into Material 3 colors.
+ * A fully resolved colour palette ready for Material 3.
  *
- * Mirror's Inkwell iOS ReaderTheme: publication rich theme → basic theme → system defaults.
- * When both a publication theme and document theme are provided, the document theme wins.
+ * Document-level theme values override publication-level ones when both exist,
+ * mirroring the cascade in standard.site's rendering spec.
  */
 data class ResolvedTheme(
     val background: Color,
@@ -24,6 +34,17 @@ data class ResolvedTheme(
     val showPageBackground: Boolean = false
 )
 
+// ── Theme Resolution ─────────────────────────────────────────────────────
+
+/**
+ * Resolves a publication/document theme cascade into a ResolvedTheme.
+ *
+ * Priority (highest first):
+ *   1. Document theme (Leaflet rich)
+ *   2. Publication theme (Leaflet rich)
+ *   3. Basic theme (4-color palette)
+ *   4. System default (dark/light)
+ */
 @Composable
 fun resolveTheme(
     publicationTheme: PublicationTheme? = null,
@@ -32,7 +53,6 @@ fun resolveTheme(
 ): ResolvedTheme {
     val isDark = isSystemInDarkTheme()
 
-    // Resolve accent and foreground from richest available source
     val accent = documentTheme?.accentBackground?.toColor()
         ?: publicationTheme?.accentBackground?.toColor()
         ?: basicTheme?.accent?.toColor()
@@ -68,7 +88,15 @@ fun resolveTheme(
     return ResolvedTheme(background, foreground, accent, accentFg, pageBg, pageWidth, showPageBg)
 }
 
-/** Inkwell-branded default colors — warm, paper-like. */
+// ── Inkwell Theme ────────────────────────────────────────────────────────
+
+/**
+ * Material 3 colour scheme for the Inkwell app.
+ *
+ * When a resolved theme is available (from a publication/document), it maps
+ * directly to Material 3's colour roles. Otherwise uses Inkwell's default
+ * warm palette: paper-like on light, cool/readable on dark.
+ */
 @Composable
 fun InkwellTheme(
     resolvedTheme: ResolvedTheme? = null,
@@ -106,7 +134,13 @@ fun InkwellTheme(
     )
 }
 
-private fun uk.ewancroft.inkwell.data.model.ColorValue.toColor(): Color =
+// ── Colour Conversion Extensions ─────────────────────────────────────────
+
+/**
+ * Converts a Leaflet ColorValue (RGBA, alpha 0-100 percentage)
+ * to a Compose Color (RGB 0-1 float, alpha 0-1 float).
+ */
+private fun ColorValue.toColor(): Color =
     Color(
         red = r / 255f,
         green = g / 255f,
@@ -114,5 +148,8 @@ private fun uk.ewancroft.inkwell.data.model.ColorValue.toColor(): Color =
         alpha = (a ?: 100) / 100f
     )
 
+/**
+ * Converts a standard.site RgbColor (fully opaque) to a Compose Color.
+ */
 private fun RgbColor.toColor(): Color =
     Color(red = r / 255f, green = g / 255f, blue = b / 255f)
