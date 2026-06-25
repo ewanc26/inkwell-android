@@ -1,3 +1,14 @@
+/**
+ * Queries the microcosm.blue Constellation API — a global AT Protocol backlink
+ * index — for cross-repo discovery of comments, recommends, and mentions.
+ *
+ * Without this, records in other users' repositories are undiscoverable.
+ * Constellation indexes the full AT Protocol firehose so we can ask
+ * "which records across the entire network link to URI X?"
+ *
+ * Mirrors Inkwell iOS ConstellationService: same endpoints, same pagination
+ * strategy, same convenience method split (comment / recommend / mention).
+ */
 package uk.ewancroft.inkwell.data.remote
 
 import kotlinx.coroutines.Dispatchers
@@ -8,17 +19,9 @@ import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
-import uk.ewancroft.inkwell.data.model.ConstellationBacklink
-import uk.ewancroft.inkwell.data.model.ConstellationResponse
+import uk.ewancroft.inkwell.data.model.bluesky.ConstellationBacklink
+import uk.ewancroft.inkwell.data.model.bluesky.ConstellationResponse
 
-/**
- * Queries the microcosm.blue Constellation API — a global AT Protocol backlink
- * index — for cross-repo discovery of comments, recommends, and mentions.
- *
- * Without this, records in other users' repositories are undiscoverable.
- * Constellation indexes the full AT Protocol firehose so we can ask
- * "which records across the entire network link to URI X?"
- */
 object ConstellationClient {
     private const val BASE_URL = "https://constellation.microcosm.blue"
 
@@ -28,6 +31,8 @@ object ConstellationClient {
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS)
         .build()
+
+    // ── Backlink Query ───────────────────────────────────────────────────
 
     /** Finds all records that link to the given subject via the given source. */
     suspend fun getBacklinks(
@@ -47,6 +52,8 @@ object ConstellationClient {
         json.decodeFromString(response.body!!.string())
     }
 
+    // ── Pagination ───────────────────────────────────────────────────────
+
     /** Paginates through all backlink results. */
     suspend fun paginateBacklinks(
         subject: String,
@@ -64,14 +71,21 @@ object ConstellationClient {
         return all.take(maxCount)
     }
 
-    // -- Convenience methods --
+    // ── Convenience Methods ──────────────────────────────────────────────
 
+    /** Comments (Leaflet pub.leaflet.comment records) pointing at this document. */
     suspend fun getCommentBacklinks(documentUri: String): List<ConstellationBacklink> =
         paginateBacklinks(documentUri, "pub.leaflet.comment:subject")
 
+    /** Recommends (standard.site graph edges) pointing at this document. */
     suspend fun getRecommendBacklinks(documentUri: String): List<ConstellationBacklink> =
         paginateBacklinks(documentUri, "site.standard.graph.recommend:document")
 
+    /**
+     * Mentions in Bluesky posts: searches both link facets and embed.external URIs.
+     * Deduplicates by (did, rkey) since a single post could have both a facet
+     * link and an embed URI referencing the same document.
+     */
     suspend fun getDocumentMentionBacklinks(url: String): List<ConstellationBacklink> {
         val facets = async { paginateBacklinks(
             url, "app.bsky.feed.post:facets[].features[app.bsky.richtext.facet#link].uri"

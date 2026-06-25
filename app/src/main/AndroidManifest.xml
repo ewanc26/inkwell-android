@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Inkwell Android app manifest.
+
+  Declares INTERNET for AT Protocol and Constellation API access,
+  POST_NOTIFICATIONS for background content-update polling (WorkManager),
+  and the OAuth redirect URI (uk.ewancroft.inkwell://callback).
+
+  The autoVerify on the OAuth intent-filter enables Android Automatic
+  Link Handling so the OS routes the OAuth callback back to Inkwell
+  without a browser redirect page.
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -21,7 +32,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- OAuth redirect -->
+            <!--
+              OAuth redirect: captures the PDS authorization callback.
+              Uses Android App Links (autoVerify) so the OS routes
+              uk.ewancroft.inkwell://callback directly to the activity
+              with no disambiguation prompt.
+            -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

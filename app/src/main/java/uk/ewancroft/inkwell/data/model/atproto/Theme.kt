@@ -1,10 +1,21 @@
+/**
+ * Theme and preference record shapes for the standard.site + Leaflet lexicons.
+ *
+ * Two theme tiers: a rich Leaflet theme (colors, fonts, page layout) and a
+ * simplified basicTheme (four-color palette only). The rendering layer cascades
+ * Leaflet -> basicTheme -> system defaults. Mirror of Inkwell iOS ThemeModels.
+ */
 package uk.ewancroft.inkwell.data.model.atproto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-// --- Theme ---
+// ── Leaflet Rich Theme ───────────────────────────────────────────────────
 
+/**
+ * Full publication/document theme from the Leaflet lexicon.
+ * Supports per-section background, heading/body font selection, page width.
+ */
 @Serializable
 data class PublicationTheme(
     @SerialName("\$type") val type: String = "pub.leaflet.publication#theme",
@@ -19,6 +30,12 @@ data class PublicationTheme(
     val bodyFont: String? = null
 )
 
+// ── Basic Theme (Four-Colour) ────────────────────────────────────────────
+
+/**
+ * Simplified palette with explicit foreground, background, accent pairs.
+ * Used as a fallback when no Leaflet rich theme is available.
+ */
 @Serializable
 data class BasicTheme(
     @SerialName("\$type") val type: String = "site.standard.theme.basic",
@@ -28,6 +45,9 @@ data class BasicTheme(
     val accentForeground: RgbColor
 )
 
+// ── Colour Types ─────────────────────────────────────────────────────────
+
+/** RGBA colour (alpha as percentage 0-100, defaults to 100 = fully opaque). */
 @Serializable
 data class ColorValue(
     @SerialName("\$type") val type: String = "pub.leaflet.theme.color#rgb",
@@ -37,6 +57,7 @@ data class ColorValue(
     val a: Int? = null
 )
 
+/** RGB colour (no alpha — fully opaque by convention). */
 @Serializable
 data class RgbColor(
     @SerialName("\$type") val type: String = "site.standard.theme.color#rgb",
@@ -45,13 +66,15 @@ data class RgbColor(
     val b: Int
 )
 
-// --- Preferences ---
+// ── Preferences ─────────────────────────────────────────────────────────
 
+/** Publication-level display toggles. */
 @Serializable
 data class PublicationPreferences(
     val showInDiscover: Boolean? = null
 )
 
+/** Per-document display toggles — each section can be hidden independently. */
 @Serializable
 data class DocumentPreferences(
     val showComments: Boolean? = null,

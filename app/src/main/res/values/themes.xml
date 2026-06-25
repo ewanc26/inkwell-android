@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--
+      Baseline Android theme for Inkwell.
+      Uses Material Light with no action bar — the Compose UI manages its
+      own top bars and navigation. Actual colour scheme is applied at
+      runtime by ui/theme/Theme.kt's InkwellTheme composable.
+    -->
     <style name="Theme.Inkwell" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>

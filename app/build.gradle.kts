@@ -1,3 +1,9 @@
+// ── App Module ──────────────────────────────────────────────────────────
+//
+// Build configuration for the Inkwell Android app. Targets API 26 (Android 8.0)
+// as the minimum, which covers the kotlinx.serialization and Compose runtime
+// requirements while still allowing access to ~95% of active devices.
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,6 +24,7 @@ android {
         versionCode = 1
         versionName = "1.0.0"
 
+        // Used by AppAuth for the OAuth redirect URI scheme
         manifestPlaceholders["appAuthRedirectScheme"] = "uk.ewancroft.inkwell"
     }
 
@@ -28,6 +35,7 @@ android {
         }
         debug {
             isDebuggable = true
+            // Separate install from release builds for side-by-side testing
             applicationIdSuffix = ".debug"
         }
     }
@@ -46,8 +54,11 @@ android {
     }
 }
 
+// ── Dependencies ────────────────────────────────────────────────────────
+
 dependencies {
-    // Compose BOM
+    // -- Compose BOM --
+    // Single BOM import controls all Compose library versions
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
     implementation(libs.compose.material3)
@@ -58,41 +69,41 @@ dependencies {
     implementation(libs.compose.foundation)
     debugImplementation(libs.compose.ui.tooling)
 
-    // Activity & Navigation
+    // -- Activity & Navigation --
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)
 
-    // Lifecycle
+    // -- Lifecycle --
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.runtime.compose)
 
-    // Network
+    // -- Network --
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
 
-    // Serialization
+    // -- Serialization --
     implementation(libs.kotlinx.serialization.json)
 
-    // Coroutines
+    // -- Coroutines --
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Data
+    // -- Data --
     implementation(libs.datastore.preferences)
 
-    // Background
+    // -- Background --
     implementation(libs.workmanager)
 
-    // Image loading
+    // -- Image Loading --
     implementation(libs.coil.compose)
 
-    // DI
+    // -- DI --
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
-    // Security
+    // -- Security (Credential Manager) --
     implementation(libs.credentials)
 }

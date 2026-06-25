@@ -1,3 +1,14 @@
+/**
+ * Post composition screen with Markdown editor.
+ *
+ * Mirrors Inkwell iOS ComposeView: select a publication, write a title and
+ * description, compose in Markdown (with future Leaflet block support),
+ * and publish to the AT Protocol via the user's PDS.
+ *
+ * Currently a placeholder — the publish flow and publication selector
+ * will connect to a ViewModel backed by the user's site.standard.publication
+ * records and the AtProtoClient.
+ */
 package uk.ewancroft.inkwell.ui.writer
 
 import androidx.compose.foundation.layout.*
@@ -18,7 +29,8 @@ fun WriterScreen() {
     var selectedPublication by remember { mutableIntStateOf(0) }
     var isPublishing by remember { mutableStateOf(false) }
 
-    val publications = remember { listOf("Select a publication...") } // Load from ViewModel
+    // Future: load from ViewModel via user's site.standard.publication records
+    val publications = remember { listOf("Select a publication...") }
 
     Scaffold(
         topBar = {
@@ -29,7 +41,7 @@ fun WriterScreen() {
             Modifier.padding(padding).padding(horizontal = 16.dp).fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Publication selector
+            // ── Publication Selector ────────────────────────────────
             OutlinedTextField(
                 value = publications[selectedPublication],
                 onValueChange = {},
@@ -39,10 +51,11 @@ fun WriterScreen() {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Format picker placeholder
+            // ── Format Badge ───────────────────────────────────────
             Text("Format: Leaflet", style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
 
+            // ── Title & Description ────────────────────────────────
             OutlinedTextField(
                 value = title, onValueChange = { title = it },
                 label = { Text("Title") }, singleLine = true,
@@ -54,7 +67,7 @@ fun WriterScreen() {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Markdown editor
+            // ── Content Editor ─────────────────────────────────────
             OutlinedTextField(
                 value = markdown, onValueChange = { markdown = it },
                 label = { Text("Content (Markdown)") },
@@ -62,6 +75,7 @@ fun WriterScreen() {
                 minLines = 10
             )
 
+            // ── Publish Button ─────────────────────────────────────
             Button(
                 onClick = { isPublishing = true },
                 enabled = title.isNotBlank() && !isPublishing,

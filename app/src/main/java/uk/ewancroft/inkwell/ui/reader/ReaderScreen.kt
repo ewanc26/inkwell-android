@@ -1,3 +1,15 @@
+/**
+ * Reader feed and post detail screens.
+ *
+ * Two-tab feed (Following / Yours) with paginated post cards and a
+ * post-detail view for full content rendering. Mirrors Inkwell iOS
+ * BrowseDocumentsView and PostDetailView.
+ *
+ * The feed is currently populated with sample cards — the full
+ * implementation connects to a ViewModel with PaginationState that loads
+ * site.standard.document records from the user's PDS and subscribed
+ * publications via Constellation.
+ */
 package uk.ewancroft.inkwell.ui.reader
 
 import androidx.compose.foundation.clickable
@@ -17,10 +29,8 @@ import coil.compose.AsyncImage
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 
-/**
- * Reader feed with "Following" and "Yours" tabs.
- * Mirrors Inkwell iOS BrowseDocumentsView with paginated loading.
- */
+// ── Reader Screen ────────────────────────────────────────────────────────
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderScreen() {
@@ -41,13 +51,15 @@ fun ReaderScreen() {
     }
 }
 
+// ── Feed Content ─────────────────────────────────────────────────────────
+
 @Composable
 private fun FeedContent(feedType: String) {
-    // In production: use ViewModel with PaginationState.
-    // For now, show the scaffold with sample cards.
+    // Future: replace sample data with ViewModel-driven PaginationState
     val posts = remember { List(6) { it } }
 
     if (posts.isEmpty()) {
+        // Empty state with contextual copy per tab
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(Icons.Outlined.Book, contentDescription = null, modifier = Modifier.size(48.dp),
@@ -83,6 +95,9 @@ private fun FeedContent(feedType: String) {
     }
 }
 
+// ── Post Card ────────────────────────────────────────────────────────────
+
+/** Single post card in the feed: cover image, title, description, metadata. */
 @Composable
 fun PostCard(
     title: String,
@@ -126,10 +141,17 @@ fun PostCard(
     }
 }
 
+// ── Post Detail Screen ───────────────────────────────────────────────────
+
+/**
+ * Full document view for a single post.
+ * Loads the site.standard.document record, resolves its theme, and renders
+ * the content blocks (Leaflet, Markdown, etc.). Placeholder until the
+ * block-rendering engine is wired in.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostDetailScreen(uri: String) {
-    // In production: load document from AT Protocol, render blocks with theme.
     Scaffold(topBar = { TopAppBar(title = { Text("Post") }) }) { padding ->
         Column(Modifier.padding(padding).padding(20.dp)) {
             Text("Post content for: $uri", style = MaterialTheme.typography.bodyLarge)

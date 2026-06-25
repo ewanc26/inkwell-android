@@ -1,3 +1,13 @@
+/**
+ * Main activity hosting the Jetpack Compose UI tree.
+ *
+ * Sets up edge-to-edge rendering, wraps content in the Inkwell theme,
+ * and hands navigation off to InkwellNavHost. The Hilt @AndroidEntryPoint
+ * annotation ensures the Dagger graph is available to child composables.
+ *
+ * Authentication gate: isAuthenticated is hard-coded to false for now,
+ * matching the iOS pre-auth flow where LoginScreen is the start destination.
+ */
 package uk.ewancroft.inkwell
 
 import android.os.Bundle

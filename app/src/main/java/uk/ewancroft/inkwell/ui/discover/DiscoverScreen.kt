@@ -1,3 +1,10 @@
+/**
+ * Publication discovery and search screen.
+ *
+ * Placeholder for the standard.site publication directory — in the full
+ * implementation this will search the AT Protocol network for publications
+ * and provide curated discovery feeds. Mirrors Inkwell iOS DiscoverView.
+ */
 package uk.ewancroft.inkwell.ui.discover
 
 import androidx.compose.foundation.layout.*

@@ -1,3 +1,11 @@
+/**
+ * AT Protocol record shapes for the standard.site publishing lexicon.
+ *
+ * These map directly to the NSManagedObject subclasses in Inkwell iOS:
+ * SitePublication and SiteDocument. The @SerialName annotations match the
+ * lexical type identifiers that the AT Protocol firehose and PDS use for
+ * record routing.
+ */
 package uk.ewancroft.inkwell.data.model.atproto
 
 import kotlinx.serialization.SerialName
@@ -7,8 +15,12 @@ import uk.ewancroft.inkwell.data.model.common.StrongRef
 import uk.ewancroft.inkwell.data.model.content.LeafletPage
 import uk.ewancroft.inkwell.data.model.content.LeafletContent
 
-// --- AT Protocol Records ---
+// ── standard.site: publication ────────────────────────────────────────────
 
+/**
+ * A blog or publishing entity. Every document lives under a publication,
+ * which owns its theme, icon, discovery preferences.
+ */
 @Serializable
 data class PublicationRecord(
     @SerialName("\$type") val type: String = "site.standard.publication",
@@ -21,6 +33,13 @@ data class PublicationRecord(
     val preferences: PublicationPreferences? = null
 )
 
+// ── standard.site: document ───────────────────────────────────────────────
+
+/**
+ * A single published post or page. Can carry content in one of several
+ * formats (Leaflet blocks, Markdown text, etc.) and optionally links
+ * back to a Bluesky post for cross-protocol federation.
+ */
 @Serializable
 data class DocumentRecord(
     @SerialName("\$type") val type: String = "site.standard.document",
