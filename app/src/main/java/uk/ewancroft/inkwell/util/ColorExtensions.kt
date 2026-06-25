@@ -6,14 +6,22 @@
  * initial template — fix if it causes build issues, but the import paths
  * in Theme.kt use the fully qualified name so it resolves correctly.
  */
-package com.example.inkwell.util
+package uk.ewancroft.inkwell.util
 
 import androidx.compose.ui.graphics.Color
 import uk.ewancroft.inkwell.data.model.atproto.ColorValue
 import uk.ewancroft.inkwell.data.model.atproto.RgbColor
 
-/** Converts a Leaflet ColorValue to a Compose Color. */
-fun ColorValue.toColor(): Color = Color(r, g, b, a ?: 255)
+/**
+ * Converts a Leaflet ColorValue to a Compose Color.
+ * ColorValue.a is a percentage (0-100, defaults to 100 = fully opaque).
+ */
+fun ColorValue.toColor(): Color = Color(
+    red = r,
+    green = g,
+    blue = b,
+    alpha = (a ?: 100) * 255 / 100
+)
 
 /** Converts a standard.site RgbColor to a Compose Color. */
-fun RgbColor.toColor(): Color = Color(r, g, b)
+fun RgbColor.toColor(): Color = Color(red = r, green = g, blue = b)

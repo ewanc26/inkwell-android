@@ -8,7 +8,7 @@
 
 [versions]
 # Build
-agp = "8.8.0"
+agp = "8.13.2"
 kotlin = "2.1.0"
 
 # UI — Compose

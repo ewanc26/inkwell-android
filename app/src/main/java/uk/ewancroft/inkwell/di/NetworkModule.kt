@@ -24,5 +24,5 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideConstellationClient(): ConstellationClient = ConstellationClient()
+    fun provideConstellationClient(): ConstellationClient = ConstellationClient
 }

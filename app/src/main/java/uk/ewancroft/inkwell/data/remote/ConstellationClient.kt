@@ -14,6 +14,7 @@ package uk.ewancroft.inkwell.data.remote
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -86,14 +87,15 @@ object ConstellationClient {
      * Deduplicates by (did, rkey) since a single post could have both a facet
      * link and an embed URI referencing the same document.
      */
-    suspend fun getDocumentMentionBacklinks(url: String): List<ConstellationBacklink> {
+    suspend fun getDocumentMentionBacklinks(url: String): List<ConstellationBacklink> = coroutineScope {
         val facets = async { paginateBacklinks(
             url, "app.bsky.feed.post:facets[].features[app.bsky.richtext.facet#link].uri"
         ) }
         val embeds = async { paginateBacklinks(
             url, "app.bsky.feed.post:embed.external.uri"
         ) }
-        val (f, e) = facets.await() to embeds.await()
-        return (f + e).distinctBy { "${it.did}:${it.rkey}" }
+        val f = facets.await()
+        val e = embeds.await()
+        (f + e).distinctBy { "${it.did}:${it.rkey}" }
     }
 }
