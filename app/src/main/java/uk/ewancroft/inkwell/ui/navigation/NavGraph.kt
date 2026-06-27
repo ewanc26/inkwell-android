@@ -17,11 +17,14 @@ import uk.ewancroft.inkwell.ui.reader.ReaderScreen
 import uk.ewancroft.inkwell.ui.reader.PostDetailScreen
 import uk.ewancroft.inkwell.ui.writer.WriterScreen
 import uk.ewancroft.inkwell.ui.discover.DiscoverScreen
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector, val selectedIcon: ImageVector) {
-    data object Reader : Screen("reader", "Read", Icons.Outlined.Book, Icons.Filled.Book)
+    data object Reader   : Screen("reader",   "Read",     Icons.Outlined.Book,    Icons.Filled.Book)
     data object Discover : Screen("discover", "Discover", Icons.Outlined.Explore, Icons.Filled.Explore)
-    data object Writer : Screen("writer", "Write", Icons.Outlined.Edit, Icons.Filled.Edit)
+    data object Writer   : Screen("writer",   "Write",    Icons.Outlined.Edit,    Icons.Filled.Edit)
 }
 
 val bottomNavItems = listOf(Screen.Reader, Screen.Discover, Screen.Writer)
@@ -30,24 +33,28 @@ val bottomNavItems = listOf(Screen.Reader, Screen.Discover, Screen.Writer)
 @Composable
 fun InkwellNavHost(
     isAuthenticated: Boolean,
-    navController: NavHostController = rememberNavController()
+    onSignOut: () -> Unit = {},
+    navController: NavHostController = rememberNavController(),
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    // Show the bottom nav only on the three root tabs — hide it on post detail.
+    val showBottomBar = isAuthenticated && currentDestination?.hierarchy?.any { dest ->
+        bottomNavItems.any { it.route == dest.route }
+    } == true
+
     Scaffold(
         bottomBar = {
-            if (isAuthenticated && currentDestination?.hierarchy?.any {
-                it.route in bottomNavItems.map { s -> s.route }
-            } == true) {
+            if (showBottomBar) {
                 NavigationBar {
                     bottomNavItems.forEach { screen ->
-                        val selected = currentDestination.hierarchy.any { it.route == screen.route }
+                        val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                         NavigationBarItem(
                             icon = {
                                 Icon(
                                     if (selected) screen.selectedIcon else screen.icon,
-                                    contentDescription = screen.label
+                                    contentDescription = screen.label,
                                 )
                             },
                             label = { Text(screen.label) },
@@ -58,7 +65,7 @@ fun InkwellNavHost(
                                     launchSingleTop = true
                                     restoreState = true
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -68,15 +75,38 @@ fun InkwellNavHost(
         NavHost(
             navController = navController,
             startDestination = if (isAuthenticated) Screen.Reader.route else "login",
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         ) {
-            composable("login") { LoginScreen() }
-            composable(Screen.Reader.route) { ReaderScreen() }
-            composable(Screen.Discover.route) { DiscoverScreen() }
-            composable(Screen.Writer.route) { WriterScreen() }
+            composable("login") {
+                LoginScreen()
+            }
+
+            composable(Screen.Reader.route) {
+                ReaderScreen(
+                    onNavigateToPost = { uri ->
+                        // AT URIs contain slashes — URL-encode before embedding in the path.
+                        val encoded = URLEncoder.encode(uri, StandardCharsets.UTF_8.name())
+                        navController.navigate("post/$encoded")
+                    },
+                    onSignOut = onSignOut,
+                )
+            }
+
+            composable(Screen.Discover.route) {
+                DiscoverScreen()
+            }
+
+            composable(Screen.Writer.route) {
+                WriterScreen()
+            }
+
             composable("post/{uri}") { backStackEntry ->
-                val uri = backStackEntry.arguments?.getString("uri") ?: return@composable
-                PostDetailScreen(uri)
+                val encoded = backStackEntry.arguments?.getString("uri") ?: return@composable
+                val uri = URLDecoder.decode(encoded, StandardCharsets.UTF_8.name())
+                PostDetailScreen(
+                    uri = uri,
+                    onBack = { navController.popBackStack() },
+                )
             }
         }
     }

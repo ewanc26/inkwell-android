@@ -31,7 +31,10 @@ class MainActivity : ComponentActivity() {
             val isAuthenticated = authState is AuthUiState.LoggedIn
 
             InkwellTheme {
-                InkwellNavHost(isAuthenticated = isAuthenticated)
+                InkwellNavHost(
+                    isAuthenticated = isAuthenticated,
+                    onSignOut = { viewModel.logout() },
+                )
             }
         }
 
