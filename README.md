@@ -1,8 +1,18 @@
 # Inkwell for Android
 
-> **⚠️ Experimental** — This is a parallel implementation of [Inkwell for iOS](https://github.com/ewanc26/inkwell). The iOS version is the primary, production-ready client. This Android port mirrors its architecture and feature set but has not yet been tested on device or submitted to any app store.
+> **⚠️ Experimental** — This is the Android companion to [Inkwell for iOS](https://github.com/ewanc26/inkwell). The iOS version is the primary, production-ready client. This Android port is an experimental work-in-progress building toward feature parity.
 
-A native Android client for the [Standard.site](https://standard.site) publishing ecosystem on AT Protocol, built with Jetpack Compose and Material 3.
+A native reader and writer for the [Standard.site](https://standard.site) publishing ecosystem on AT Protocol, built with Jetpack Compose, Material 3, and Kotlin.
+
+**The Writer's Desk — for Android.**
+
+## Features
+
+- **Read** — Reads `site.standard.publication` and `site.standard.document` records from their owning PDS, rendered in a familiar three-tab layout (Read / Discover / Write). Renders Leaflet block content and Markpub/Offprint/pckt markdown formats. Resolves display theme from Leaflet's rich palette through `basicTheme` to Material 3 defaults.
+- **Discover** — Searches the cross-platform public index used by the Standard.site ecosystem, then fetches authoritative records directly from the author. Cross-repo comment discovery via Constellation (microcosm.blue). Paginated feed with infinite scroll and prev/next post navigation.
+- **Write** — Publishes Standard.site documents with portable metadata and selectable content formats.
+- **AT Protocol Native** — OAuth-based authentication with your AT Protocol handle (no app password). Silent session restoration on relaunch.
+- **Verification Built In** — Checks publication `.well-known` verification and document `<link rel="site.standard.document">` verification. Background notification polling via WorkManager.
 
 ## Relationship to Inkwell iOS
 
@@ -15,25 +25,9 @@ A native Android client for the [Standard.site](https://standard.site) publishin
 | **Serialization** | Codable | kotlinx.serialization |
 | **DI** | @Environment | Hilt |
 | **Background** | BGAppRefreshTask | WorkManager |
-| **Status** | TestFlight-ready | Pre-alpha |
+| **Status** | Production-ready | Experimental |
 
 Both versions share the same AT Protocol data model shapes, the same Constellation cross-repo discovery pattern, the same publication/document theme resolution cascade, and the same three-tab structure (Read / Discover / Write).
-
-## Features
-
-Aligns with Inkwell iOS feature set:
-
-- OAuth-based AT Protocol authentication (no app password)
-- Reads `site.standard.publication` and `site.standard.document` records from their owning PDS
-- Renders Leaflet block content and Markpub/Offprint/pckt markdown formats
-- Resolves display theme from Leaflet's rich palette → `basicTheme` → Material 3 defaults
-- Publishes standard.site documents with selectable content formats
-- Creates and removes `site.standard.graph.subscription` and `site.standard.graph.recommend` records
-- Cross-repo comment discovery via Constellation (microcosm.blue)
-- Paginated feed with infinite scroll
-- Prev/next post navigation
-- App Intents for Siri/Shortcuts (iOS) / Assistant (Android)
-- Background notification polling
 
 ## Architecture
 
@@ -62,7 +56,12 @@ app/src/main/java/uk/ewancroft/inkwell/
    cd inkwell-android
    ```
 2. Open in Android Studio (Hedgehog or later).
-3. Sync Gradle and run on an API 26+ device or emulator.
+3. Build with Gradle:
+   ```bash
+   ./gradlew assembleDebug
+   ```
+4. Run on an API 26+ device or emulator.
+5. Sign in with your AT Protocol handle via OAuth (the system browser will open for authorization).
 
 ## Dependencies
 

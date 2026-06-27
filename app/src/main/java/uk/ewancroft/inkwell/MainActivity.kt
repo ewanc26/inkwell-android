@@ -1,32 +1,53 @@
-/**
- * Main activity hosting the Jetpack Compose UI tree.
- *
- * Sets up edge-to-edge rendering, wraps content in the Inkwell theme,
- * and hands navigation off to InkwellNavHost. The Hilt @AndroidEntryPoint
- * annotation ensures the Dagger graph is available to child composables.
- *
- * Authentication gate: isAuthenticated is hard-coded to false for now,
- * matching the iOS pre-auth flow where LoginScreen is the start destination.
- */
 package uk.ewancroft.inkwell
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dagger.hilt.android.AndroidEntryPoint
+import uk.ewancroft.inkwell.ui.auth.AuthUiState
+import uk.ewancroft.inkwell.ui.auth.AuthViewModel
 import uk.ewancroft.inkwell.ui.navigation.InkwellNavHost
 import uk.ewancroft.inkwell.ui.theme.InkwellTheme
-import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private var authViewModel: AuthViewModel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val viewModel: AuthViewModel = hiltViewModel()
+            authViewModel = viewModel
+
+            val authState by viewModel.uiState.collectAsStateWithLifecycle()
+            val isAuthenticated = authState is AuthUiState.LoggedIn
+
             InkwellTheme {
-                InkwellNavHost(isAuthenticated = false)
+                InkwellNavHost(isAuthenticated = isAuthenticated)
             }
+        }
+
+        handleOAuthRedirect(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleOAuthRedirect(intent)
+    }
+
+    private fun handleOAuthRedirect(intent: Intent?) {
+        val data = intent?.data ?: return
+        if (data.scheme == "uk.ewancroft.inkwell" && data.host == "callback" || data.authority == "callback") {
+            authViewModel?.completeLogin(data.toString())
         }
     }
 }

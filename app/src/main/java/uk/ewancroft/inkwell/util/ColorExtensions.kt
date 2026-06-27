@@ -17,11 +17,14 @@ import uk.ewancroft.inkwell.data.model.atproto.RgbColor
  * ColorValue.a is a percentage (0-100, defaults to 100 = fully opaque).
  */
 fun ColorValue.toColor(): Color = Color(
-    red = r,
-    green = g,
-    blue = b,
-    alpha = (a ?: 100) * 255 / 100
+    red = r / 255f,
+    green = g / 255f,
+    blue = b / 255f,
+    alpha = (a ?: 100) / 100f
 )
 
-/** Converts a standard.site RgbColor to a Compose Color. */
-fun RgbColor.toColor(): Color = Color(red = r, green = g, blue = b)
+fun RgbColor.toColor(): Color = Color(
+    red = r / 255f,
+    green = g / 255f,
+    blue = b / 255f,
+)
