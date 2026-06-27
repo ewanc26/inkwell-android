@@ -4,7 +4,7 @@
 
   Declares INTERNET for AT Protocol and Constellation API access,
   POST_NOTIFICATIONS for background content-update polling (WorkManager),
-  and the OAuth redirect URI (uk.ewancroft.inkwell://callback).
+  and the OAuth redirect URI (uk.ewancroft.inkwell:/callback).
 
   The autoVerify on the OAuth intent-filter enables Android Automatic
   Link Handling so the OS routes the OAuth callback back to Inkwell
@@ -34,17 +34,18 @@
 
             <!--
               OAuth redirect: captures the PDS authorization callback.
-              Uses Android App Links (autoVerify) so the OS routes
-              uk.ewancroft.inkwell://callback directly to the activity
-              with no disambiguation prompt.
+              Uses scheme-only filter (no host) because the redirect URI
+              is uk.ewancroft.inkwell:/callback (single slash, matching
+              the client-metadata.json served by inkwell.ewancroft.uk).
+              Since the URI has no authority component, Android would
+              not match a host-based intent filter; we match on scheme
+              + path instead.
             -->
-            <intent-filter android:autoVerify="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="uk.ewancroft.inkwell"
-                    android:host="callback" />
+                <data android:scheme="uk.ewancroft.inkwell" />
             </intent-filter>
         </activity>
     </application>
