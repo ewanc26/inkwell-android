@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
     private fun handleOAuthRedirect(intent: Intent?) {
         val data = intent?.data ?: return
-        if (data.scheme == "uk.ewancroft.inkwell" && data.host == "callback" || data.authority == "callback") {
+        if (data.scheme == "uk.ewancroft.inkwell" && data.path?.startsWith("/callback") == true) {
             authViewModel?.completeLogin(data.toString())
         }
     }
