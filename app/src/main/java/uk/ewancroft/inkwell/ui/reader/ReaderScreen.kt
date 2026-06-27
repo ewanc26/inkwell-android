@@ -107,7 +107,9 @@ private fun FeedContent(
                     description = post.description,
                     publicationName = post.publicationName,
                     date = post.date,
-                    coverUrl = post.coverUrl
+                    coverUrl = post.coverUrl,
+                    authorDisplayName = post.authorDisplayName,
+                    authorAvatar = post.authorAvatar,
                 )
             }
         }
@@ -120,7 +122,9 @@ fun PostCard(
     description: String?,
     publicationName: String?,
     date: String,
-    coverUrl: String?
+    coverUrl: String?,
+    authorDisplayName: String? = null,
+    authorAvatar: String? = null,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -138,6 +142,20 @@ fun PostCard(
             }
 
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (authorAvatar != null) {
+                        AsyncImage(
+                            model = authorAvatar,
+                            contentDescription = null,
+                            modifier = Modifier.size(28.dp).clip(MaterialTheme.shapes.extraLarge),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    if (authorDisplayName != null) {
+                        Text(authorDisplayName, style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
                 Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 if (description != null) {
                     Text(description, style = MaterialTheme.typography.bodySmall,
