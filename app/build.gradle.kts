@@ -9,22 +9,21 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
     namespace = "uk.ewancroft.inkwell"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "uk.ewancroft.inkwell"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
 
-        // Used by AppAuth for the OAuth redirect URI scheme
         manifestPlaceholders["appAuthRedirectScheme"] = "uk.ewancroft.inkwell"
     }
 
@@ -79,33 +78,30 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.runtime.compose)
 
-    // -- Network --
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
 
-    // -- Serialization --
+    implementation(libs.ktor.client.cio)
+
     implementation(libs.kotlinx.serialization.json)
 
-    // -- Coroutines --
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-    // -- Data --
-    implementation(libs.datastore.preferences)
-
-    // -- Background --
-    implementation(libs.workmanager)
-
-    // -- Image Loading --
     implementation(libs.coil.compose)
 
-    // -- DI --
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
-    // -- Security (Credential Manager) --
-    implementation(libs.credentials)
+    implementation(libs.atproto.runtime)
+    implementation(libs.atproto.models)
+    implementation(libs.atproto.oauth)
+    implementation(libs.atproto.compose.material3)
+
+    implementation(libs.browser)
+    implementation(libs.security.crypto)
+
+    // Dagger 2.57+ unshaded kotlin-metadata-jvm; add explicit version for Kotlin 2.3.0 support
+    ksp("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
 }

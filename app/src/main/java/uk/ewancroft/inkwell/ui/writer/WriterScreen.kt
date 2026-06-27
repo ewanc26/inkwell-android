@@ -1,36 +1,27 @@
-/**
- * Post composition screen with Markdown editor.
- *
- * Mirrors Inkwell iOS ComposeView: select a publication, write a title and
- * description, compose in Markdown (with future Leaflet block support),
- * and publish to the AT Protocol via the user's PDS.
- *
- * Currently a placeholder — the publish flow and publication selector
- * will connect to a ViewModel backed by the user's site.standard.publication
- * records and the AtProtoClient.
- */
 package uk.ewancroft.inkwell.ui.writer
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WriterScreen() {
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var markdown by remember { mutableStateOf("") }
-    var selectedPublication by remember { mutableIntStateOf(0) }
-    var isPublishing by remember { mutableStateOf(false) }
+fun WriterScreen(
+    viewModel: WriterViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
 
-    // Future: load from ViewModel via user's site.standard.publication records
-    val publications = remember { listOf("Select a publication...") }
+    LaunchedEffect(Unit) {
+        viewModel.loadPublications()
+    }
 
     Scaffold(
         topBar = {
@@ -41,52 +32,87 @@ fun WriterScreen() {
             Modifier.padding(padding).padding(horizontal = 16.dp).fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // ── Publication Selector ────────────────────────────────
-            OutlinedTextField(
-                value = publications[selectedPublication],
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Publication") },
-                trailingIcon = { Icon(Icons.Outlined.ArrowDropDown, null) },
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (uiState.isLoadingPublications) {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = uiState.selectedPublication?.name ?: "Select a publication...",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Publication") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        uiState.publications.forEach { pub ->
+                            DropdownMenuItem(
+                                text = { Text(pub.name) },
+                                onClick = {
+                                    viewModel.selectPublication(pub)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
 
-            // ── Format Badge ───────────────────────────────────────
             Text("Format: Leaflet", style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-            // ── Title & Description ────────────────────────────────
             OutlinedTextField(
-                value = title, onValueChange = { title = it },
+                value = uiState.title, onValueChange = { viewModel.onTitleChanged(it) },
                 label = { Text("Title") }, singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = description, onValueChange = { description = it },
+                value = uiState.description, onValueChange = { viewModel.onDescriptionChanged(it) },
                 label = { Text("Description (optional)") }, maxLines = 3,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // ── Content Editor ─────────────────────────────────────
             OutlinedTextField(
-                value = markdown, onValueChange = { markdown = it },
+                value = uiState.markdown, onValueChange = { viewModel.onMarkdownChanged(it) },
                 label = { Text("Content (Markdown)") },
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 minLines = 10
             )
 
-            // ── Publish Button ─────────────────────────────────────
+            if (uiState.publishError != null) {
+                Text(
+                    uiState.publishError!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            if (uiState.publishSuccess != null) {
+                Text(
+                    uiState.publishSuccess!!,
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
             Button(
-                onClick = { isPublishing = true },
-                enabled = title.isNotBlank() && !isPublishing,
+                onClick = { viewModel.publish() },
+                enabled = uiState.title.isNotBlank() && uiState.selectedPublication != null && !uiState.isPublishing,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (isPublishing) {
+                if (uiState.isPublishing) {
                     CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp,
                         color = MaterialTheme.colorScheme.onPrimary)
                     Spacer(Modifier.width(8.dp))
                 }
-                Icon(Icons.Outlined.Send, null)
+                Icon(Icons.AutoMirrored.Outlined.Send, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text("Publish")
             }
