@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
+import uk.ewancroft.inkwell.ui.components.InkwellMark
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -53,16 +54,14 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            Icons.Outlined.Book,
-            contentDescription = null,
-            modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.primary
+        InkwellMark(
+            modifier = Modifier.height(52.dp),
+            color = MaterialTheme.colorScheme.onBackground,
         )
         Spacer(Modifier.height(16.dp))
         Text("Inkwell", style = MaterialTheme.typography.headlineLarge)
         Text(
-            "Read and write on the AT Protocol",
+            "Sign in with your AT Protocol account",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
