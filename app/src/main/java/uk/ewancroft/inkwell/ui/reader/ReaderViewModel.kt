@@ -22,7 +22,9 @@ data class PostItem(
     val publicationName: String?,
     val date: String,
     val coverUrl: String?,
-    val site: String
+    val site: String,
+    val authorDisplayName: String? = null,
+    val authorAvatar: String? = null,
 )
 
 data class ReaderUiState(
@@ -63,8 +65,6 @@ class ReaderViewModel @Inject constructor(
     private suspend fun loadFollowingFeed(session: uk.ewancroft.inkwell.data.repository.UserSessionInfo) {
         _uiState.value = _uiState.value.copy(isLoadingFollowing = true, error = null)
         try {
-            val posts = mutableListOf<PostItem>()
-
             val subscriptionsResponse = pdsRepository.listRecords(
                 did = session.did,
                 collection = "site.standard.graph.subscription",
@@ -72,17 +72,27 @@ class ReaderViewModel @Inject constructor(
             )
 
             val subscriptionsJson = subscriptionsResponse["records"]?.jsonArray.orEmpty()
+
+            val didToProfile = mutableMapOf<String, uk.ewancroft.inkwell.data.model.bluesky.BlueskyProfile>()
+            val posts = mutableListOf<PostItem>()
+
             for (subJson in subscriptionsJson) {
                 try {
                     val valueObj = subJson.jsonObject["value"]?.jsonObject ?: continue
                     val publication = valueObj["publication"]?.jsonPrimitive?.content ?: continue
                     val parsed = AtUri.parse(publication) ?: continue
 
+                    if (parsed.did !in didToProfile) {
+                        runCatching { pdsRepository.getProfile(parsed.did) }
+                            .onSuccess { didToProfile[parsed.did] = it }
+                    }
+
                     val docsResponse = pdsRepository.listRecords(
                         did = parsed.did,
                         collection = "site.standard.document"
                     )
                     val docsJson = docsResponse["records"]?.jsonArray.orEmpty()
+                    val profile = didToProfile[parsed.did]
                     for (docJson in docsJson) {
                         try {
                             val docValue = docJson.jsonObject["value"]?.jsonObject ?: continue
@@ -91,10 +101,13 @@ class ReaderViewModel @Inject constructor(
                                 uri = docUri,
                                 title = docValue["title"]?.jsonPrimitive?.content ?: "Untitled",
                                 description = docValue["description"]?.jsonPrimitive?.contentOrNull,
-                                publicationName = null,
+                                publicationName = profile?.displayName ?: profile?.handle,
                                 date = docValue["publishedAt"]?.jsonPrimitive?.content?.take(10) ?: "",
-                                coverUrl = null,
-                                site = docValue["site"]?.jsonPrimitive?.content ?: ""
+                                coverUrl = docValue["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.content
+                                    ?: docValue["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content,
+                                site = docValue["site"]?.jsonPrimitive?.content ?: "",
+                                authorDisplayName = profile?.displayName,
+                                authorAvatar = profile?.avatar,
                             ))
                         } catch (_: Exception) {}
                     }
@@ -116,6 +129,8 @@ class ReaderViewModel @Inject constructor(
     private suspend fun loadYoursFeed(session: uk.ewancroft.inkwell.data.repository.UserSessionInfo) {
         _uiState.value = _uiState.value.copy(isLoadingYours = true)
         try {
+            val profile = runCatching { pdsRepository.getProfile(session.did) }.getOrNull()
+
             val response = pdsRepository.listRecords(
                 did = session.did,
                 collection = "site.standard.document",
@@ -130,10 +145,13 @@ class ReaderViewModel @Inject constructor(
                         uri = docUri,
                         title = valueObj["title"]?.jsonPrimitive?.content ?: "Untitled",
                         description = valueObj["description"]?.jsonPrimitive?.contentOrNull,
-                        publicationName = null,
+                        publicationName = profile?.displayName ?: profile?.handle,
                         date = valueObj["publishedAt"]?.jsonPrimitive?.content?.take(10) ?: "",
-                        coverUrl = null,
-                        site = valueObj["site"]?.jsonPrimitive?.content ?: ""
+                        coverUrl = valueObj["coverImage"]?.jsonObject?.get("link")?.jsonPrimitive?.content
+                            ?: valueObj["coverImage"]?.jsonObject?.get("\$link")?.jsonPrimitive?.content,
+                        site = valueObj["site"]?.jsonPrimitive?.content ?: "",
+                        authorDisplayName = profile?.displayName,
+                        authorAvatar = profile?.avatar,
                     )
                 } catch (_: Exception) { null }
             }
