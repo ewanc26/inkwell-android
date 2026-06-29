@@ -169,7 +169,7 @@ class PdsRepository @Inject constructor(
                 services?.firstOrNull { service ->
                     val type = service.jsonObject["type"]?.jsonPrimitive?.content
                     type == "AtprotoPersonalDataServer" || type == "PersonalDataServer"
-                }?.jsonObject?.get("url")?.jsonPrimitive?.content
+                }?.jsonObject?.get("serviceEndpoint")?.jsonPrimitive?.content
                     ?: body["pdsUrl"]?.jsonPrimitive?.content
             } catch (_: Exception) { null }
         }
