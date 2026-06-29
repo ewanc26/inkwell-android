@@ -25,6 +25,7 @@ data class PublicationItem(
 data class WriterUiState(
     val publications: List<PublicationItem> = emptyList(),
     val selectedPublication: PublicationItem? = null,
+    val selectedFormat: String = "Leaflet",
     val title: String = "",
     val description: String = "",
     val markdown: String = "",
@@ -50,6 +51,10 @@ class WriterViewModel @Inject constructor(
 
     fun selectPublication(publication: PublicationItem) {
         _uiState.value = _uiState.value.copy(selectedPublication = publication)
+    }
+
+    fun selectFormat(format: String) {
+        _uiState.value = _uiState.value.copy(selectedFormat = format)
     }
 
     fun onTitleChanged(title: String) {

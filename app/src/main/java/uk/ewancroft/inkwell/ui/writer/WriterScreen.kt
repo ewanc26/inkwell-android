@@ -20,8 +20,11 @@ fun WriterScreen(
     onSignOut: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var expanded by remember { mutableStateOf(false) }
+    var pubExpanded by remember { mutableStateOf(false) }
+    var formatExpanded by remember { mutableStateOf(false) }
     var showCredits by remember { mutableStateOf(false) }
+
+    val formats = listOf("Leaflet", "Markpub", "pckt", "Offprint")
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val appVersion = remember {
@@ -73,29 +76,29 @@ fun WriterScreen(
                     Text("Create a Publication")
                 }
             } else {
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
-                ) {
-                    OutlinedTextField(
-                        value = uiState.selectedPublication?.name ?: "Select a publication...",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Publication") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                // Publication picker
+                Box {
+                    OutlinedButton(
+                        onClick = { pubExpanded = true },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            uiState.selectedPublication?.name ?: "Select a publication...",
+                            modifier = Modifier.weight(1f),
+                        )
+                        Icon(Icons.Outlined.ArrowDropDown, contentDescription = null)
+                    }
+                    DropdownMenu(
+                        expanded = pubExpanded,
+                        onDismissRequest = { pubExpanded = false },
                     ) {
                         uiState.publications.forEach { pub ->
                             DropdownMenuItem(
                                 text = { Text(pub.name) },
                                 onClick = {
                                     viewModel.selectPublication(pub)
-                                    expanded = false
-                                }
+                                    pubExpanded = false
+                                },
                             )
         }
     }
@@ -115,8 +118,30 @@ fun WriterScreen(
                 }
             }
 
-            Text("Format: Leaflet", style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            // Format picker
+            Box {
+                OutlinedButton(
+                    onClick = { formatExpanded = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(uiState.selectedFormat, modifier = Modifier.weight(1f))
+                    Icon(Icons.Outlined.ArrowDropDown, contentDescription = null)
+                }
+                DropdownMenu(
+                    expanded = formatExpanded,
+                    onDismissRequest = { formatExpanded = false },
+                ) {
+                    formats.forEach { format ->
+                        DropdownMenuItem(
+                            text = { Text(format) },
+                            onClick = {
+                                viewModel.selectFormat(format)
+                                formatExpanded = false
+                            },
+                        )
+                    }
+                }
+            }
 
             OutlinedTextField(
                 value = uiState.title, onValueChange = { viewModel.onTitleChanged(it) },
