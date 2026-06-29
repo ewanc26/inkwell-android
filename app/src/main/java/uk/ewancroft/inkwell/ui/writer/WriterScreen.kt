@@ -36,6 +36,14 @@ fun WriterScreen(
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
+            } else if (uiState.publications.isEmpty()) {
+                Text("No publications found.", style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Button(onClick = { viewModel.showCreateDialog() }) {
+                    Icon(Icons.Outlined.Add, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Create a Publication")
+                }
             } else {
                 ExposedDropdownMenuBox(
                     expanded = expanded,
@@ -63,6 +71,11 @@ fun WriterScreen(
                             )
                         }
                     }
+                }
+                TextButton(onClick = { viewModel.showCreateDialog() }) {
+                    Icon(Icons.Outlined.Add, contentDescription = null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("New Publication")
                 }
             }
 
@@ -117,5 +130,62 @@ fun WriterScreen(
                 Text("Publish")
             }
         }
+
+            if (uiState.showCreateDialog) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.dismissCreateDialog() },
+                    title = { Text("New Publication") },
+                    text = {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            OutlinedTextField(
+                                value = uiState.createUrl,
+                                onValueChange = { viewModel.onCreateUrlChanged(it) },
+                                label = { Text("URL (e.g. https://mysite.com)") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            OutlinedTextField(
+                                value = uiState.createName,
+                                onValueChange = { viewModel.onCreateNameChanged(it) },
+                                label = { Text("Publication Name") },
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            OutlinedTextField(
+                                value = uiState.createDescription,
+                                onValueChange = { viewModel.onCreateDescriptionChanged(it) },
+                                label = { Text("Description (optional)") },
+                                maxLines = 3,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            if (uiState.createError != null) {
+                                Text(
+                                    uiState.createError!!,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = { viewModel.createPublication() },
+                            enabled = uiState.createUrl.isNotBlank() && uiState.createName.isNotBlank() && !uiState.isCreating
+                        ) {
+                            if (uiState.isCreating) {
+                                CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.onPrimary)
+                                Spacer(Modifier.width(8.dp))
+                            }
+                            Text("Create")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { viewModel.dismissCreateDialog() }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+        }
     }
-}

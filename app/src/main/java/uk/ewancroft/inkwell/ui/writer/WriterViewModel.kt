@@ -31,7 +31,13 @@ data class WriterUiState(
     val isPublishing: Boolean = false,
     val publishError: String? = null,
     val publishSuccess: String? = null,
-    val isLoadingPublications: Boolean = false
+    val isLoadingPublications: Boolean = false,
+    val showCreateDialog: Boolean = false,
+    val createUrl: String = "",
+    val createName: String = "",
+    val createDescription: String = "",
+    val isCreating: Boolean = false,
+    val createError: String? = null,
 )
 
 @HiltViewModel
@@ -42,7 +48,80 @@ class WriterViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(WriterUiState())
     val uiState: StateFlow<WriterUiState> = _uiState.asStateFlow()
 
-    fun loadPublications() {
+    fun selectPublication(publication: PublicationItem) {
+        _uiState.value = _uiState.value.copy(selectedPublication = publication)
+    }
+
+    fun onTitleChanged(title: String) {
+        _uiState.value = _uiState.value.copy(title = title, publishError = null, publishSuccess = null)
+    }
+
+    fun onDescriptionChanged(description: String) {
+        _uiState.value = _uiState.value.copy(description = description)
+    }
+
+    fun onMarkdownChanged(markdown: String) {
+        _uiState.value = _uiState.value.copy(markdown = markdown)
+    }
+
+    fun showCreateDialog() {
+        _uiState.value = _uiState.value.copy(
+            showCreateDialog = true,
+            createUrl = "",
+            createName = "",
+            createDescription = "",
+            createError = null,
+        )
+    }
+
+    fun dismissCreateDialog() {
+        _uiState.value = _uiState.value.copy(showCreateDialog = false)
+    }
+
+    fun onCreateUrlChanged(url: String) {
+        _uiState.value = _uiState.value.copy(createUrl = url, createError = null)
+    }
+
+    fun onCreateNameChanged(name: String) {
+        _uiState.value = _uiState.value.copy(createName = name, createError = null)
+    }
+
+    fun onCreateDescriptionChanged(description: String) {
+        _uiState.value = _uiState.value.copy(createDescription = description)
+    }
+
+    fun createPublication() {
+        val state = _uiState.value
+        if (state.createUrl.isBlank() || state.createName.isBlank()) {
+            _uiState.value = state.copy(createError = "URL and Name are required")
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isCreating = true, createError = null)
+            try {
+                val url = state.createUrl.trim().trimEnd('/')
+                val name = state.createName.trim()
+                val desc = state.createDescription.trim().ifBlank { null }
+
+                val result = pdsRepository.createPublication(url = url, name = name, description = desc)
+                val newUri = result["uri"]?.jsonPrimitive?.content
+                _uiState.value = _uiState.value.copy(
+                    isCreating = false,
+                    showCreateDialog = false,
+                    publishSuccess = "Publication record created. Configure its verification endpoint before publishing.",
+                )
+                loadPublications(selecting = newUri)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isCreating = false,
+                    createError = "Failed to create publication: ${e.message}",
+                )
+            }
+        }
+    }
+
+    fun loadPublications(selecting: String? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoadingPublications = true)
             try {
@@ -65,7 +144,9 @@ class WriterViewModel @Inject constructor(
                 }
                 _uiState.value = _uiState.value.copy(
                     publications = pubs,
-                    selectedPublication = pubs.firstOrNull(),
+                    selectedPublication = selecting?.let { uri ->
+                        pubs.firstOrNull { it.uri == uri }
+                    } ?: pubs.firstOrNull(),
                     isLoadingPublications = false
                 )
             } catch (e: Exception) {
@@ -75,22 +156,6 @@ class WriterViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    fun selectPublication(publication: PublicationItem) {
-        _uiState.value = _uiState.value.copy(selectedPublication = publication)
-    }
-
-    fun onTitleChanged(title: String) {
-        _uiState.value = _uiState.value.copy(title = title, publishError = null, publishSuccess = null)
-    }
-
-    fun onDescriptionChanged(description: String) {
-        _uiState.value = _uiState.value.copy(description = description)
-    }
-
-    fun onMarkdownChanged(markdown: String) {
-        _uiState.value = _uiState.value.copy(markdown = markdown)
     }
 
     fun publish() {
