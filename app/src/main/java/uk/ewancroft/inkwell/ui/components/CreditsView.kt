@@ -144,6 +144,13 @@ fun CreditsView(
                     Text("Sign Out")
                 }
 
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Inkwell for iOS is also available on GitHub.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
                 Spacer(Modifier.height(24.dp))
             }
         }
