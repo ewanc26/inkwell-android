@@ -78,9 +78,7 @@ fun CreditsView(
 
                 // Built On
                 SectionHeader("Built On")
-                CreditRow(title = "ATProtoKit", detail = "AT Protocol SDK by MasterJ93", url = "https://github.com/MasterJ93/ATProtoKit", openUrl = ::openUrl)
-                CreditRow(title = "OAuthenticator", detail = "OAuth 2.1 authentication (from ChimeHQ / germ-network)", url = "https://github.com/germ-network/OAuthenticator", openUrl = ::openUrl)
-                CreditRow(title = "ATResolve", detail = "AT Protocol identity resolution (from ChimeHQ / germ-network)", url = "https://github.com/germ-network/ATResolve", openUrl = ::openUrl)
+                CreditRow(title = "atproto-kotlin", detail = "AT Protocol SDK + OAuth 2.1 by kikin81", url = "https://github.com/kikin81/atproto-kotlin", openUrl = ::openUrl)
                 CreditRow(title = "Standard.site", detail = "The publishing protocol Inkwell reads and writes", url = "https://standard.site", openUrl = ::openUrl)
                 CreditRow(title = "pub search", detail = "Cross-platform Standard.site search index", url = "https://leaflet-search-backend.fly.dev", openUrl = ::openUrl)
                 Spacer(Modifier.height(8.dp))
