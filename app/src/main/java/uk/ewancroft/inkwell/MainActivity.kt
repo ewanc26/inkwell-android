@@ -33,17 +33,25 @@ import uk.ewancroft.inkwell.ui.theme.InkwellTheme
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private var authViewModel: AuthViewModel? = null
+    private val pendingIntent = mutableStateOf<Intent?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val viewModel: AuthViewModel = hiltViewModel()
-            authViewModel = viewModel
 
             val authState by viewModel.uiState.collectAsStateWithLifecycle()
             val isAuthenticated = authState is AuthUiState.LoggedIn
+
+            val intentToHandle = pendingIntent.value ?: intent
+            LaunchedEffect(intentToHandle) {
+                intentToHandle?.data?.let { data ->
+                    if (data.scheme == "uk.ewancroft.inkwell" && data.path?.startsWith("/callback") == true) {
+                        viewModel.completeLogin(data.toString())
+                    }
+                }
+            }
 
             var showSplash by remember { mutableStateOf(true) }
             val splashOpacity = remember { Animatable(1f) }
@@ -100,20 +108,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
-        handleOAuthRedirect(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        handleOAuthRedirect(intent)
-    }
-
-    private fun handleOAuthRedirect(intent: Intent?) {
-        val data = intent?.data ?: return
-        if (data.scheme == "uk.ewancroft.inkwell" && data.path?.startsWith("/callback") == true) {
-            authViewModel?.completeLogin(data.toString())
-        }
+        pendingIntent.value = intent
     }
 }
