@@ -107,6 +107,20 @@ class PdsRepository @Inject constructor(
         )
     }
 
+    suspend fun createPublication(
+        url: String,
+        name: String,
+        description: String? = null,
+    ): JsonObject {
+        val record = buildJsonObject {
+            put("\$type", "site.standard.publication")
+            put("url", url)
+            put("name", name)
+            if (description != null) put("description", description)
+        }
+        return createRecord("site.standard.publication", record)
+    }
+
     suspend fun deleteRecord(collection: String, rkey: String) {
         val session = sessionStore.load() ?: throw Exception("Not authenticated")
         val authClient = atOAuth.createClient()
