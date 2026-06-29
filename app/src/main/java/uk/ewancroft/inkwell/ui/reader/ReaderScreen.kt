@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import uk.ewancroft.inkwell.ui.components.CreditsView
 import uk.ewancroft.inkwell.ui.components.InkwellMark
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,6 +30,16 @@ fun ReaderScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val tabs = listOf("Following", "Yours")
+
+    var showCredits by remember { mutableStateOf(false) }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val appVersion = remember {
+        try {
+            val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
+            "Version ${pkg.versionName} (${pkg.longVersionCode})"
+        } catch (_: Exception) { "Version 1.0.0 (1)" }
+    }
 
     Scaffold(
         topBar = {
@@ -56,6 +67,9 @@ fun ReaderScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { showCredits = true }) {
+                        Icon(Icons.Outlined.Info, contentDescription = "About")
+                    }
                     IconButton(onClick = { viewModel.loadData() }) {
                         Icon(Icons.Outlined.Refresh, contentDescription = "Refresh")
                     }
@@ -104,6 +118,14 @@ fun ReaderScreen(
         ) {
             Text(uiState.error!!)
         }
+    }
+
+    if (showCredits) {
+        CreditsView(
+            appVersion = appVersion,
+            onSignOut = onSignOut,
+            onDismiss = { showCredits = false },
+        )
     }
 }
 

@@ -55,7 +55,7 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center
     ) {
         InkwellMark(
-            modifier = Modifier.height(52.dp),
+            modifier = Modifier.height(48.dp),
             color = MaterialTheme.colorScheme.onBackground,
         )
         Spacer(Modifier.height(16.dp))
@@ -126,12 +126,16 @@ fun LoginScreen(
         Text(
             "Inkwell uses OAuth to sign in to your PDS securely.",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
         )
         Text(
             "Your browser will open so you can approve access — no app password needed.",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
