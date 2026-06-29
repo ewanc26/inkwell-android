@@ -68,7 +68,7 @@ fun DiscoverScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator()
                             Spacer(Modifier.height(8.dp))
-                            Text("Searching...", style = MaterialTheme.typography.bodySmall,
+                            Text("Searching the Standard.site network...", style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
@@ -78,15 +78,15 @@ fun DiscoverScreen(
                         Text(uiState.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
-                uiState.results.isEmpty() -> {
+                uiState.results.isEmpty() && !uiState.isSearching -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Outlined.Explore, null, Modifier.size(48.dp),
+                            Icon(Icons.Outlined.Search, null, Modifier.size(48.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(Modifier.height(16.dp))
-                            Text("Discover Publications", style = MaterialTheme.typography.titleMedium)
+                            Text("Search the Open Web", style = MaterialTheme.typography.titleMedium)
                             Text(
-                                "Search for standard.site publications across the AT Protocol network.",
+                                "Find Standard.site writing from Leaflet, pckt, Offprint, and independent publishers.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

@@ -46,16 +46,18 @@ fun ReaderScreen(
                         Text("Reader", style = MaterialTheme.typography.titleLarge)
                     }
                 },
-                actions = {
-                    IconButton(onClick = { viewModel.loadData() }) {
-                        Icon(Icons.Outlined.Refresh, contentDescription = "Refresh")
-                    }
+                navigationIcon = {
                     IconButton(onClick = onSignOut) {
                         Icon(
                             Icons.AutoMirrored.Outlined.Logout,
-                            contentDescription = "Sign out",
+                            contentDescription = "Sign Out",
                             tint = MaterialTheme.colorScheme.error,
                         )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.loadData() }) {
+                        Icon(Icons.Outlined.Refresh, contentDescription = "Refresh")
                     }
                 },
             )

@@ -83,18 +83,22 @@ fun LoginScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        OutlinedTextField(
-            value = handle,
-            onValueChange = { handle = it },
-            label = { Text("AT Protocol handle") },
-            placeholder = { Text("alice.bsky.social") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Uri,
-                imeAction = ImeAction.Go
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+        Column(Modifier.fillMaxWidth()) {
+            Text("Handle", style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(4.dp))
+            OutlinedTextField(
+                value = handle,
+                onValueChange = { handle = it },
+                placeholder = { Text("yourname.bsky.social") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Uri,
+                    imeAction = ImeAction.Go
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
         Spacer(Modifier.height(16.dp))
 
@@ -114,13 +118,18 @@ fun LoginScreen(
                 )
                 Spacer(Modifier.width(8.dp))
             }
-            Text("Sign in with your PDS")
+            Text("Continue")
         }
 
         Spacer(Modifier.height(12.dp))
 
         Text(
-            "Your data stays in your Personal Data Server. No app password needed — OAuth only.",
+            "Inkwell uses OAuth to sign in to your PDS securely.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            "Your browser will open so you can approve access — no app password needed.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

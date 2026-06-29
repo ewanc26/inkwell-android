@@ -2,6 +2,7 @@ package uk.ewancroft.inkwell.ui.writer
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -14,7 +15,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WriterScreen(
-    viewModel: WriterViewModel = hiltViewModel()
+    viewModel: WriterViewModel = hiltViewModel(),
+    onSignOut: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var expanded by remember { mutableStateOf(false) }
@@ -25,7 +27,18 @@ fun WriterScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Write") })
+            TopAppBar(
+                title = { Text("Write") },
+                navigationIcon = {
+                    IconButton(onClick = onSignOut) {
+                        Icon(
+                            Icons.AutoMirrored.Outlined.Logout,
+                            contentDescription = "Sign Out",
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                },
+            )
         }
     ) { padding ->
         Column(
