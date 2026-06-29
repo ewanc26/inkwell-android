@@ -93,7 +93,7 @@ fun InkwellNavHost(
             }
 
             composable(Screen.Discover.route) {
-                DiscoverScreen()
+                DiscoverScreen(onSignOut = onSignOut)
             }
 
             composable(Screen.Writer.route) {

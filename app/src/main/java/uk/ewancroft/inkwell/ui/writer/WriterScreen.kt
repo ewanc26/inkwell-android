@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import uk.ewancroft.inkwell.ui.components.CreditsView
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,6 +21,15 @@ fun WriterScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var expanded by remember { mutableStateOf(false) }
+    var showCredits by remember { mutableStateOf(false) }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val appVersion = remember {
+        try {
+            val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
+            "Version ${pkg.versionName} (${pkg.longVersionCode})"
+        } catch (_: Exception) { "Version 1.0.0 (1)" }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadPublications()
@@ -36,6 +46,11 @@ fun WriterScreen(
                             contentDescription = "Sign Out",
                             tint = MaterialTheme.colorScheme.error,
                         )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showCredits = true }) {
+                        Icon(Icons.Outlined.Info, contentDescription = "About")
                     }
                 },
             )
@@ -82,9 +97,17 @@ fun WriterScreen(
                                     expanded = false
                                 }
                             )
-                        }
-                    }
-                }
+        }
+    }
+
+    if (showCredits) {
+        CreditsView(
+            appVersion = appVersion,
+            onSignOut = onSignOut,
+            onDismiss = { showCredits = false },
+        )
+    }
+}
                 TextButton(onClick = { viewModel.showCreateDialog() }) {
                     Icon(Icons.Outlined.Add, contentDescription = null, Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))

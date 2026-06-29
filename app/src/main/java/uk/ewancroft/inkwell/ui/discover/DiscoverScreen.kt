@@ -16,17 +16,37 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import uk.ewancroft.inkwell.ui.components.CreditsView
 import uk.ewancroft.inkwell.data.model.common.SearchResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscoverScreen(
-    viewModel: DiscoverViewModel = hiltViewModel()
+    viewModel: DiscoverViewModel = hiltViewModel(),
+    onSignOut: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showCredits by remember { mutableStateOf(false) }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val appVersion = remember {
+        try {
+            val pkg = context.packageManager.getPackageInfo(context.packageName, 0)
+            "Version ${pkg.versionName} (${pkg.longVersionCode})"
+        } catch (_: Exception) { "Version 1.0.0 (1)" }
+    }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Discover") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Discover") },
+                actions = {
+                    IconButton(onClick = { showCredits = true }) {
+                        Icon(Icons.Outlined.Info, contentDescription = "About")
+                    }
+                },
+            )
+        }
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
             OutlinedTextField(
@@ -127,6 +147,14 @@ fun DiscoverScreen(
                 }
             }
         }
+    }
+
+    if (showCredits) {
+        CreditsView(
+            appVersion = appVersion,
+            onSignOut = onSignOut,
+            onDismiss = { showCredits = false },
+        )
     }
 }
 
