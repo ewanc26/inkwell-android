@@ -97,7 +97,7 @@ fun InkwellNavHost(
             }
 
             composable(Screen.Writer.route) {
-                WriterScreen()
+                WriterScreen(onSignOut = onSignOut)
             }
 
             composable("post/{uri}") { backStackEntry ->
