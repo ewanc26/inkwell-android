@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -71,13 +72,21 @@ fun DiscoverScreen(
             )
 
             Row(
-                Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 4.dp),
                 horizontalArrangement = Arrangement.End
             ) {
                 Button(
                     onClick = { viewModel.search() },
                     enabled = uiState.query.isNotBlank() && !uiState.isSearching
                 ) {
+                    Icon(
+                        Icons.Outlined.Search,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
                     Text("Search")
                 }
             }
@@ -108,7 +117,9 @@ fun DiscoverScreen(
                             Text(
                                 "Find Standard.site writing from Leaflet, pckt, Offprint, and independent publishers.",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 32.dp)
                             )
                         }
                     }
