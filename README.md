@@ -1,6 +1,6 @@
 # Inkwell for Android
 
-> **Experimental** — Android companion to [Inkwell for iOS](https://github.com/ewanc26/inkwell). The iOS version is the primary client. This is a work-in-progress toward feature parity.
+> **Archived** — This repository has been consolidated into the [Inkwell monorepo](https://github.com/ewanc26/inkwell). The Android source now lives under `Android/` in that repo. Please open issues and PRs there instead.
 
 A native reader and writer for the [Standard.site](https://standard.site) publishing ecosystem on AT Protocol. Built with Jetpack Compose, Material 3, and Kotlin.
 
@@ -53,7 +53,8 @@ Add `https://inkwell.ewancroft.uk/fdroid/repo` as a custom repo in [F-Droid](htt
 ## Getting started
 
 ```bash
-git clone https://github.com/ewanc26/inkwell-android.git
+git clone https://github.com/ewanc26/inkwell.git
+cd inkwell/Android
 ```
 
 Open in Android Studio (Hedgehog or later). Build with Gradle:
