@@ -34,3 +34,15 @@ Guidance for agents working on the experimental Android Inkwell client. It is a 
 - Run `./gradlew clean assembleDebug lint test` with a valid local Android SDK/JDK, then add targeted unit/instrumentation tests for changed behavior. For release-sensitive work also run `./gradlew assembleRelease` and inspect R8 output.
 - Manually test OAuth success/cancel/state/error/restore/logout; navigation after callback; malformed/expired encrypted storage; cross-PDS reads; pagination/status/network failures; actual document records; Unicode/blob/theme decoding; rotation/process death; large fonts; and TalkBack.
 - Never commit `local.properties`, `.idea/`, `.gradle/`, `app/build/`, signing material, OAuth sessions, or local `.letta/` data.
+
+<!-- allowed-agents -->
+## Allowed agents
+
+Only **Claude** (Anthropic) and **Mistral** (Mistral AI) may be used as coding agents in this repository. This rule supersedes any earlier agent-attribution guidance in this file.
+
+- Agent-assisted commits must credit only one of those agents:
+  - `Co-Authored-By: Claude <noreply@anthropic.com>`
+  - `Co-Authored-By: Mistral Vibe <vibe@mistral.ai>`
+- Allowed agent footers are `🤖 Generated with [Claude Code](https://claude.com/claude-code)` and `🤖 Generated with [Mistral Vibe](https://mistral.ai)`.
+- Do not add `Co-Authored-By:` trailers, `Generated with` footers, author names, or committer identities for any other agent or AI tool.
+- Do not credit another agent in commit metadata.
